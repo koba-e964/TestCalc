@@ -1,6 +1,10 @@
 package kobae964_app.varcalc;
 
-import static kobae964_app.calc.Scanner.TokenType.*;
+import static kobae964_app.varcalc.Scanner.TokenType.*;
+
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class Parser {
 	Scanner scan;
@@ -28,6 +32,11 @@ public class Parser {
 		{
 			return Integer.parseInt(num.toString());
 		}
+		@Override
+		public String toString()
+		{
+			return num.toString();
+		}
 	}
 	/**
 	 * UnaryExpression = + UnaryExpression | - UnaryExpression | (Expression) | NumericExpression
@@ -50,6 +59,7 @@ public class Parser {
 			return una;
 		}
 		return new UnaryExpression(numeric());
+		//constructor UnaryExpression(BinaryOperator,UnaryExpression,UnaryExpression) is not dealt with here.
 	}
 	public static class UnaryExpression
 	{
@@ -57,6 +67,11 @@ public class Parser {
 		Token op=null;
 		UnaryExpression uex=null;
 		Expression ex=null;
+		/*
+		 * For OpParser's use only
+		 */
+		BinaryOperator bop=null;
+		UnaryExpression term1=null,term2=null;
 		public UnaryExpression(Token op,UnaryExpression uex)
 		{
 			if(op.getType()!=OPERATOR)
@@ -74,6 +89,19 @@ public class Parser {
 		{
 			this.ex=ex;
 		}
+		/**
+		 * This constructor should be called only in OpParser.
+		 * example: (+ 2 3)
+		 * (* 3 (+ 2 6))
+		 * 
+		 */
+		public UnaryExpression(BinaryOperator op2,
+				UnaryExpression unaryExpression,
+				UnaryExpression unaryExpression2) {
+			bop=op2;
+			term1=unaryExpression;
+			term2=unaryExpression2;
+		}
 		public int getValue()
 		{
 			if(num==null)
@@ -84,107 +112,112 @@ public class Parser {
 			}
 			return num.getValue();
 		}
+		@Override
+		public String toString()
+		{
+			if(num==null)
+			{
+				if(ex!=null)return ex.toString();
+				if(uex!=null)
+					return (op.toString().equals("-")?"-":"")+uex.toString();
+				return "("+bop+" "+term1+" "+term2+")";
+			}
+			return num.toString();
+		}
+	}
+	public BinaryOperator biop()
+	{
+		return new BinaryOperator(scan.next());
+	}
+	public static class BinaryOperator
+	{
+		static Set<String> ops;
+		private String op;
+		static
+		{
+			ops=new HashSet<String>();
+			for(char ch:"+-*/%&|^=<>".toCharArray())
+			{
+				ops.add(new String(new char[]{ch}));
+			}
+			ops.add("&&");
+			ops.add("||");
+			ops.add("==");
+			ops.add("!=");
+			ops.add("<=");
+			ops.add(">=");
+		}
+		public BinaryOperator(Token op)
+		{
+			this.op=op.getContent();
+			if(!ops.contains(op.getContent()))
+			{
+				throw new IllegalArgumentException("Illegal operator:"+op);
+			}
+		}
+		public String getName()
+		{
+			return op;
+		}
+		@Override
+		public String toString()
+		{
+			return "operator"+op;
+		}
+	}
+	public OperatedExpression opexp()
+	{
+		UnaryExpression first=unary();
+		Token peeked=scan.peek();
+		if(peeked!=null && peeked.getType()==OPERATOR)
+		{
+			BinaryOperator op=biop();
+			OperatedExpression rest=opexp();
+			return new OperatedExpression(first, op, rest);
+		}
+		return new OperatedExpression(first);
 	}
 	/**
-	 *  MultiplicativeExpression = UnaryExpression ((*|/) UnaryExpression)
+	 * OperatedExpression ::= UnaryExpression (BinaryOperator UnaryExpression)*
+	 *
 	 */
-	public MultiplicativeExpression multi()
+	public static class OperatedExpression
 	{
-		MultiplicativeExpression left=new MultiplicativeExpression(unary());
-		while(true)
+		UnaryExpression first;
+		BinaryOperator op;
+		OperatedExpression rest;
+		public OperatedExpression(UnaryExpression first,BinaryOperator op,OperatedExpression rest)
 		{
-			Token next=scan.peek();
-			if(next == null || next.getType()!=OPERATOR_M)
-			{break;}
-			next=scan.next();
-			UnaryExpression right=unary();
-			left=new MultiplicativeExpression(left, right,next);
+			this.first=first;
+			this.op=op;
+			this.rest=rest;
 		}
-		return left;
-	}
-	public static class MultiplicativeExpression
-	{
-		MultiplicativeExpression left;
-		UnaryExpression right;
-		boolean div=false;
-		public MultiplicativeExpression(UnaryExpression un)
+		public OperatedExpression(UnaryExpression cont)
 		{
-			this.left=null;
-			this.right=un;
+			this.first=cont;
+			op=null;
+			rest=null;
 		}
-
-		public MultiplicativeExpression(MultiplicativeExpression left,UnaryExpression right,Token tok)
+		public boolean isTerm()
 		{
-			this.left=left;
-			this.right=right;
-			this.div=tok.toString().equals("/");
+			return op==null;
 		}
-		public int getValue()
+		@Override
+		public String toString()
 		{
-			if(left==null)
-				return right.getValue();
-			int l=left.getValue();
-			int r=right.getValue();
-			return div?l/r:l*r;
-		}
-	}
-	/**
-	 * AdditiveExpression = MultiplicativeExpression ((+|-) MulplicativeExpression)*
-	 */
-	public AdditiveExpression additive()
-	{
-		AdditiveExpression left=new AdditiveExpression(multi());
-		while(true)
-		{
-			Token next=scan.peek();
-			if(next == null || next.getType()!=OPERATOR)
-			{break;}
-			next=scan.next();
-			MultiplicativeExpression right=multi();
-			left=new AdditiveExpression(left, right,next);
-		}
-		return left;
-	}
-	public static class AdditiveExpression
-	{
-		AdditiveExpression left;
-		MultiplicativeExpression right;
-		boolean subt=false;
-		public AdditiveExpression(MultiplicativeExpression un)
-		{
-			this.left=null;
-			this.right=un;
-		}
-
-		public AdditiveExpression(AdditiveExpression left,MultiplicativeExpression right,Token tok)
-		{
-			this.left=left;
-			this.right=right;
-			this.subt=tok.toString().equals("-");
-		}
-		public int getValue()
-		{
-			if(left==null)
-				return right.getValue();
-			int l=left.getValue();
-			int r=right.getValue();
-			return subt?l-r:l+r;
+			return "("+first.toString()+" "+op+" "+rest+")";
 		}
 	}
 	public Expression exp()
 	{
-		return new Expression(additive());
+		throw new UnsupportedOperationException("exp() Not yet implemented");
 	}
 	public static class Expression
 	{
-		AdditiveExpression ar;
-		public Expression(AdditiveExpression ae)
-		{
-			this.ar=ae;
-		}
-		public int getValue()
-		{
-			return ar.getValue();
+
+		public int getValue() {
+			// TODO Auto-generated method stub
+			return 0;
 		}
 	}
 }

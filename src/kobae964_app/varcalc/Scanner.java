@@ -27,7 +27,6 @@ public class Scanner {
 	{
 		NUMERIC,
 		OPERATOR,
-		OPERATOR_M,
 		LEFT_PAREN,
 		RIGHT_PAREN,
 	}

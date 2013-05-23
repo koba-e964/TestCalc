@@ -1,11 +1,11 @@
 package kobae964_app.varcalc;
 
-import static kobae964_app.calc.Scanner.TokenType.*;
+import static kobae964_app.varcalc.Scanner.TokenType.*;
 
 import java.util.Arrays;
 import java.util.List;
 
-import kobae964_app.calc.Scanner.TokenType;
+import kobae964_app.varcalc.Scanner.TokenType;
 
 public class Token
 {
@@ -21,10 +21,6 @@ public class Token
 		if(isOperator(str))
 		{
 			type=OPERATOR;
-		}
-		if(isMOperator(str))
-		{
-			type=OPERATOR_M;
 		}
 		if(str.equals("("))
 		{
@@ -44,20 +40,19 @@ public class Token
 	{
 		return str;
 	}
+	public String getContent()
+	{
+		return str;
+	}
 	public static boolean isNumeric(String str)
 	{
 		if(str.length()==0)return false;
 		char ch=str.charAt(0);
 		return ch>='0' && ch<='9';
 	}
-	private static List<String> operators=Arrays.asList(new String[]{"+","-"});
-	private static List<String> operators_m=Arrays.asList(new String[]{"*","/"});
+	private static List<String> operators=Arrays.asList(new String[]{"+","-","*","/","%","&","|","^","&&","||","=","=="});
 	public static boolean isOperator(String str)
 	{
 		return operators.contains(str);
-	}
-	public static boolean isMOperator(String str)
-	{
-		return operators_m.contains(str);
 	}
 }
