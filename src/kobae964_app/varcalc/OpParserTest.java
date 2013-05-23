@@ -22,5 +22,15 @@ public class OpParserTest {
 		UnaryExpression result=OpParser.parse(oex);
 		System.out.println(result);
 	}
+	@Test
+	public void testParse2() {
+		{
+			int val=2;
+			Scanner scanner=new Scanner(Tokenizer.split("1+4/3*"+val));
+			OperatedExpression oex=new Parser(scanner).opexp();
+			UnaryExpression result=OpParser.parse(oex);
+			System.out.println(result);
+		}
+	}
 
 }
