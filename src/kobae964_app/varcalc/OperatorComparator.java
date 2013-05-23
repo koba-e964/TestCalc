@@ -20,6 +20,11 @@ public class OperatorComparator
 			return this==p||(this.fst.equals(p.fst)&&this.snd.equals(p.snd));
 		}
 		@Override
+		public boolean equals(Object o)
+		{
+			return o instanceof Pair&&equals((Pair)o);
+		}
+		@Override
 		public
 		int hashCode()
 		{
