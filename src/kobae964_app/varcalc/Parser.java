@@ -1,6 +1,6 @@
 package kobae964_app.varcalc;
 
-import static kobae964_app.varcalc.Scanner.TokenType.*;
+import static kobae964_app.varcalc.TokenType.*;
 
 import java.util.Arrays;
 import java.util.HashSet;

@@ -29,11 +29,4 @@ public class Scanner {
 	{
 		return pos<token.length;
 	}
-	public static enum TokenType
-	{
-		NUMERIC,
-		OPERATOR,
-		LEFT_PAREN,
-		RIGHT_PAREN,
-	}
 }
