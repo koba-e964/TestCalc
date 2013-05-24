@@ -1,6 +1,7 @@
 package kobae964_app.varcalc;
 
 import static org.junit.Assert.*;
+import kobae964_app.varcalc.Parser.Expression;
 import kobae964_app.varcalc.Parser.OperatedExpression;
 
 import org.junit.Test;
@@ -12,7 +13,16 @@ public class ParserTest {
 		Parser parser=new Parser(new Scanner(
 				Tokenizer.split("1+2*3+4%5&8")));
 		OperatedExpression result=parser.opexp();
-		System.out.println(result);
+		try
+		{
+			System.out.println(result);
+			fail();
+		}
+		catch(OperatorOrderUndecidableException ex)
+		{
+			assertEquals("%", ex.op1);
+			assertEquals("&", ex.op2);
+		}
 	}
 	@Test
 	public void testOpexp2() {
@@ -38,6 +48,14 @@ public class ParserTest {
 		assertEquals(21*15+34-15%2,result.getValue());
 		System.out.println(OpParser.parse(result));
 		
+	}
+	@Test
+	public void testExp1() {
+		Parser parser=new Parser(new Scanner(
+				Tokenizer.split("21*(15+34)-15%2")));
+		Expression result=parser.exp();
+		assertEquals(21*(15+34)-15%2,result.getValue());
+		System.out.println(result);
 	}
 	
 }

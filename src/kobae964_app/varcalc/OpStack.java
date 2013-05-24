@@ -41,7 +41,6 @@ class OpStack
 			}
 			else
 			{
-				System.err.println(this);
 				throw new OperatorOrderUndecidableException(pre, op);
 			}
 		}

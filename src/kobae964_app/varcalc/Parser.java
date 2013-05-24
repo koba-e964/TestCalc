@@ -299,7 +299,7 @@ public class Parser {
 		@Override
 		public String toString()
 		{
-			return "("+first.toString()+" "+op+" "+rest+")";
+			return OpParser.parse(this).toString();
 		}
 		public int getValue()
 		{
@@ -308,13 +308,26 @@ public class Parser {
 	}
 	public Expression exp()
 	{
-		throw new UnsupportedOperationException("exp() Not yet implemented");
+		return new Expression(opexp());
 	}
+	/**
+	 * Expression ::= OperatedExpression
+	 */
 	public static class Expression extends AbstractExpression
 	{
-
+		OperatedExpression oex;
+		public Expression(OperatedExpression oex)
+		{
+			this.oex=oex;
+		}
+		@Override
 		public int getValue() {
-			throw new UnsupportedOperationException();
+			return oex.getValue();
+		}
+		@Override
+		public String toString()
+		{
+			return oex.toString();
 		}
 	}
 }
