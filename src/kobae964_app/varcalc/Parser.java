@@ -12,12 +12,15 @@ public class Parser {
 	{
 		this.scan=scan;
 	}
-	
+	public static abstract class AbstractExpression
+	{
+		public abstract int getValue();
+	}
 	public NumericExpression numeric()
 	{
 		return new NumericExpression(scan.next());
 	}
-	public static class NumericExpression
+	public static class NumericExpression extends AbstractExpression
 	{
 		Token num;
 		public NumericExpression(Token tok)
@@ -28,6 +31,7 @@ public class Parser {
 			}
 			num=tok;
 		}
+		@Override
 		public int getValue()
 		{
 			return Integer.parseInt(num.toString());
@@ -61,14 +65,24 @@ public class Parser {
 		return new UnaryExpression(numeric());
 		//constructor UnaryExpression(BinaryOperator,UnaryExpression,UnaryExpression) is not dealt with here.
 	}
-	public static class UnaryExpression
+	public static class UnaryExpression extends AbstractExpression
 	{
+		/*
+		 * NumericExpression
+		 */
 		NumericExpression num;
+		/*
+		 * (+|-)UnaryExpression
+		 */
 		Token op=null;
 		UnaryExpression uex=null;
+		/*
+		 * (Expression)
+		 */
 		Expression ex=null;
 		/*
 		 * For OpParser's use only
+		 * (biop)
 		 */
 		BinaryOperator bop=null;
 		UnaryExpression term1=null,term2=null;
@@ -108,9 +122,89 @@ public class Parser {
 			{
 				if(ex!=null)
 					return ex.getValue();
-				return uex.getValue()* (op.toString().equals("-")?-1:1);
+				if(uex!=null)
+					return uex.getValue()* (op.toString().equals("-")?-1:1);
+				return getValueBiop();
 			}
 			return num.getValue();
+		}
+		private int getValueBiop()
+		{
+			int val1=term1.getValue();
+			int val2=term2.getValue();
+			//case(bop.getName())
+			String name=bop.getName();
+			if(name.equals("+"))
+			{
+				return val1+val2;
+			}
+			if(name.equals("-"))
+			{
+				return val1-val2;
+			}
+			if(name.equals("*"))
+			{
+				return val1*val2;
+			}
+			if(name.equals("/"))
+			{
+				return val1/val2;
+			}
+			if(name.equals("%"))
+			{
+				return val1%val2;
+			}
+			if(name.equals("&"))
+			{
+				return val1&val2;
+			}
+			if(name.equals("|"))
+			{
+				return val1|val2;
+			}
+			if(name.equals("^"))
+			{
+				return val1^val2;
+			}
+			/*
+			 * Comparison
+			 */
+			if(name.equals("=="))
+			{
+				return val1==val2?1:0;
+			}
+			if(name.equals("!="))
+			{
+				return val1!=val2?1:0;
+			}
+			if(name.equals("<"))
+			{
+				return val1<val2?1:0;
+			}
+			if(name.equals(">"))
+			{
+				return val1>val2?1:0;
+			}
+			if(name.equals("<="))
+			{
+				return val1<=val2?1:0;
+			}
+			if(name.equals(">="))
+			{
+				return val1>=val2?1:0;
+			}
+			/*
+			 * Shortcut Operators 
+			 */
+			if(name.equals("&&"))
+			{
+				return val1==0?0:val2;
+			}
+			if(name.equals("||"))
+			{
+				return val1!=0?val1:val2;
+			}
+			throw new IllegalStateException("Illegal Operator: "+bop);
 		}
 		@Override
 		public String toString()
@@ -181,7 +275,7 @@ public class Parser {
 	 * OperatedExpression ::= UnaryExpression (BinaryOperator UnaryExpression)*
 	 *
 	 */
-	public static class OperatedExpression
+	public static class OperatedExpression extends AbstractExpression
 	{
 		UnaryExpression first;
 		BinaryOperator op;
@@ -207,17 +301,20 @@ public class Parser {
 		{
 			return "("+first.toString()+" "+op+" "+rest+")";
 		}
+		public int getValue()
+		{
+			return OpParser.parse(this).getValue();
+		}
 	}
 	public Expression exp()
 	{
 		throw new UnsupportedOperationException("exp() Not yet implemented");
 	}
-	public static class Expression
+	public static class Expression extends AbstractExpression
 	{
 
 		public int getValue() {
-			// TODO Auto-generated method stub
-			return 0;
+			throw new UnsupportedOperationException();
 		}
 	}
 }
