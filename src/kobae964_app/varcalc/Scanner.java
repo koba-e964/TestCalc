@@ -1,5 +1,7 @@
 package kobae964_app.varcalc;
 
+import java.util.NoSuchElementException;
+
 public class Scanner {
 	public Scanner(String[] split)
 	{
@@ -15,7 +17,7 @@ public class Scanner {
 	{
 		if(pos<token.length)
 			return token[pos++];
-		return null;
+		throw new NoSuchElementException("No tokens remaining");
 	}
 	public Token peek()
 	{

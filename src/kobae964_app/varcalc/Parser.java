@@ -2,7 +2,9 @@ package kobae964_app.varcalc;
 
 import static kobae964_app.varcalc.Scanner.TokenType.*;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -42,19 +44,47 @@ public class Parser {
 			return num.toString();
 		}
 	}
+	public UnaryOperator unop()
+	{
+		return new UnaryOperator(scan.next());
+	}
+	public static class UnaryOperator
+	{
+		String op;
+		final List<String> ops=Arrays.asList("+","-","!","~");
+		public UnaryOperator(Token tok)
+		{
+			String op=tok.getContent();
+			if(!ops.contains(op))
+			{
+				throw new IllegalArgumentException("Illegal unary operator:"+op);
+			}
+		}
+		public String getName()
+		{
+			return op;
+		}
+		@Override
+		public String toString()
+		{
+			return "operator"+op+"(int)";
+		}
+	}
 	/**
-	 * UnaryExpression = + UnaryExpression | - UnaryExpression | (Expression) | NumericExpression
+	 * UnaryExpression = ("+"|"-") UnaryExpression | "(" Expression ")" | NumericExpression
 	 *
 	 */
 	public UnaryExpression unary()
 	{
 		Token next=scan.peek();
-		if(next.type==OPERATOR)
+		switch(next.getType())
 		{
-			next=scan.next();
-			return new UnaryExpression(next,unary());
+		case OPERATOR:
+		{
+			UnaryOperator unop=unop();
+			return new UnaryExpression(unop,unary());
 		}
-		if(next.getType()==LEFT_PAREN)
+		case LEFT_PAREN:
 		{
 			next=scan.next();
 			UnaryExpression una=new UnaryExpression(exp());
@@ -62,46 +92,46 @@ public class Parser {
 				throw new IllegalArgumentException();
 			return una;
 		}
-		return new UnaryExpression(numeric());
+		case NUMERIC:
+			return new UnaryExpression(numeric());
+		default:
+			throw new IllegalStateException("unary() couldn't find an unary expression");
+		}
 		//constructor UnaryExpression(BinaryOperator,UnaryExpression,UnaryExpression) is not dealt with here.
 	}
 	public static class UnaryExpression extends AbstractExpression
 	{
 		/*
-		 * NumericExpression
-		 */
-		NumericExpression num;
-		/*
 		 * (+|-)UnaryExpression
 		 */
-		Token op=null;
+		UnaryOperator op=null;
 		UnaryExpression uex=null;
 		/*
 		 * (Expression)
 		 */
 		Expression ex=null;
 		/*
+		 * NumericExpression
+		 */
+		NumericExpression num;
+		/*
 		 * For OpParser's use only
 		 * (biop)
 		 */
 		BinaryOperator bop=null;
 		UnaryExpression term1=null,term2=null;
-		public UnaryExpression(Token op,UnaryExpression uex)
+		public UnaryExpression(UnaryOperator op,UnaryExpression uex)
 		{
-			if(op.getType()!=OPERATOR)
-			{
-				throw new IllegalArgumentException();
-			}
 			this.op=op;
 			this.uex=uex;
-		}
-		public UnaryExpression(NumericExpression nex)
-		{
-			num=nex;
 		}
 		public UnaryExpression(Expression ex)
 		{
 			this.ex=ex;
+		}
+		public UnaryExpression(NumericExpression nex)
+		{
+			num=nex;
 		}
 		/**
 		 * This constructor should be called only in OpParser.
@@ -118,15 +148,23 @@ public class Parser {
 		}
 		public int getValue()
 		{
-			if(num==null)
+			if(uex!=null)
 			{
-				if(ex!=null)
-					return ex.getValue();
-				if(uex!=null)
-					return uex.getValue()* (op.toString().equals("-")?-1:1);
-				return getValueBiop();
+				if(op.getName().equals("+"))return +uex.getValue();
+				if(op.getName().equals("-"))return -uex.getValue();
+				if(op.getName().equals("!"))return uex.getValue()==0?1:0;
+				if(op.getName().equals("~"))return ~uex.getValue();
+				throw new IllegalStateException("Invalid Unary Operator:"+op);
 			}
-			return num.getValue();
+			if(ex!=null)
+			{
+				return ex.getValue();
+			}
+			if(num!=null)
+			{
+				return num.getValue();
+			}
+			return getValueBiop();
 		}
 		private int getValueBiop()
 		{
@@ -209,14 +247,12 @@ public class Parser {
 		@Override
 		public String toString()
 		{
-			if(num==null)
-			{
-				if(ex!=null)return ex.toString();
-				if(uex!=null)
-					return (op.toString().equals("-")?"-":"")+uex.toString();
-				return "("+bop+" "+term1+" "+term2+")";
-			}
-			return num.toString();
+			if(uex!=null)
+				return op.getName()+uex.toString();
+			if(ex!=null)return ex.toString();
+			if(num!=null)
+				return num.toString();
+			return "("+bop.getName()+" "+term1+" "+term2+")";
 		}
 	}
 	public BinaryOperator biop()
