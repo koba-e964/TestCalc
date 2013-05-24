@@ -259,6 +259,10 @@ public class Parser {
 			return "operator"+op;
 		}
 	}
+	/**
+	 * OperatedExpression ::= UnaryExpression (BinaryOperator UnaryExpression)*
+	 *
+	 */
 	public OperatedExpression opexp()
 	{
 		UnaryExpression first=unary();
@@ -271,10 +275,6 @@ public class Parser {
 		}
 		return new OperatedExpression(first);
 	}
-	/**
-	 * OperatedExpression ::= UnaryExpression (BinaryOperator UnaryExpression)*
-	 *
-	 */
 	public static class OperatedExpression extends AbstractExpression
 	{
 		UnaryExpression first;
@@ -306,13 +306,13 @@ public class Parser {
 			return OpParser.parse(this).getValue();
 		}
 	}
+	/**
+	 * Expression ::= OperatedExpression
+	 */
 	public Expression exp()
 	{
 		return new Expression(opexp());
 	}
-	/**
-	 * Expression ::= OperatedExpression
-	 */
 	public static class Expression extends AbstractExpression
 	{
 		OperatedExpression oex;
