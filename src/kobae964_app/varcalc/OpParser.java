@@ -11,6 +11,48 @@ public class OpParser {
 	{
 		OperatedExpression current=oex;
 		OperatorComparator oc=new OperatorComparator();
+		for(String op1:new String[]{"*","/","%"})
+		{
+			for(String op2:new String[]{"+","-"})
+			{
+				oc.setGt(op1, op2);
+				oc.setLt(op2, op1);
+			}
+		}
+		final String[]  additive={"+","-"};
+		for(String op1:additive)
+		{
+			for(String op2:additive)
+			{
+				oc.setGt(op1, op2);
+			}
+		}
+		final String[] multi={"*","/","%"};
+		for(String op1:multi)
+		{
+			for(String op2:multi)
+			{
+				oc.setGt(op1, op2);
+			}
+		}
+		for(String op1:new String[]{"+","-","*","/","%"})
+		{
+			for(String op2:new String[]{"==","!=","<=",">="})
+			{
+				oc.setGt(op1, op2);
+				oc.setLt(op2,op1);
+			}
+		}
+		for(String op:new String[]{"&","|","^"})
+		{
+			oc.setGt(op, op);
+		}
+		for(String op:new String[]{"+","-","*","/","%","==","!=","<=",">=","&","|","^"})
+		{
+			oc.setGt(op, "=");
+			oc.setLt("=", op);
+		}
+		oc.setLt("=", "=");
 		OpStack stack=new OpStack(oc);
 		stack.pushUnary(oex.first);
 		while(true)

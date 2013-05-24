@@ -50,7 +50,7 @@ public class Token
 		char ch=str.charAt(0);
 		return ch>='0' && ch<='9';
 	}
-	private static List<String> operators=Arrays.asList(new String[]{"+","-","*","/","%","&","|","^","&&","||","=","=="});
+	private static List<String> operators=Arrays.asList(new String[]{"+","-","*","/","%","&","|","^","&&","||","=","==","<",">","<=",">=","!="});
 	public static boolean isOperator(String str)
 	{
 		return operators.contains(str);
