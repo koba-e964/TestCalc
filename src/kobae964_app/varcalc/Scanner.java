@@ -13,17 +13,21 @@ public class Scanner {
 	}
 	Token[] token;
 	int pos=0;
-	public Token next()
+	public Token next()throws NoSuchElementException
 	{
 		if(pos<token.length)
 			return token[pos++];
 		throw new NoSuchElementException("No tokens remaining");
 	}
-	public Token peek()
+	public Token peek()throws NoSuchElementException
 	{
 		if(pos<token.length)
 			return token[pos];
-		return null;
+		throw new NoSuchElementException("No tokens remaining");
+	}
+	public boolean hasNext()
+	{
+		return pos<token.length;
 	}
 	public static enum TokenType
 	{

@@ -302,8 +302,7 @@ public class Parser {
 	public OperatedExpression opexp()
 	{
 		UnaryExpression first=unary();
-		Token peeked=scan.peek();
-		if(peeked!=null && peeked.getType()==OPERATOR)
+		if(scan.hasNext()&& scan.peek().getType()==OPERATOR)
 		{
 			BinaryOperator op=biop();
 			OperatedExpression rest=opexp();
