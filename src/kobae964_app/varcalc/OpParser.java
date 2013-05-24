@@ -1,8 +1,5 @@
 package kobae964_app.varcalc;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-
 import kobae964_app.varcalc.Parser.OperatedExpression;
 import kobae964_app.varcalc.Parser.UnaryExpression;
 
