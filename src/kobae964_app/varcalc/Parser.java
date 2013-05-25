@@ -59,6 +59,7 @@ public class Parser {
 			{
 				throw new IllegalArgumentException("Illegal unary operator:"+op);
 			}
+			this.op=op;
 		}
 		public String getName()
 		{
@@ -268,7 +269,7 @@ public class Parser {
 			ops=new HashSet<String>();
 			for(char ch:"+-*/%&|^=<>".toCharArray())
 			{
-				ops.add(new String(new char[]{ch}));
+				ops.add(new String(new char[]{ch}).intern());
 			}
 			ops.add("&&");
 			ops.add("||");

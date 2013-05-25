@@ -57,5 +57,16 @@ public class ParserTest {
 		assertEquals(21*(15+34)-15%2,result.getValue());
 		System.out.println(result);
 	}
+	@Test
+	public void testExp2() {
+		String[] split=Tokenizer.split("21*(-15+34* -34)-15%2");
+		for(String s:split){
+			System.out.print(s+" ");
+		}
+		Parser parser=new Parser(new Scanner(split));
+		Expression result=parser.exp();
+		assertEquals(21*(-15+34* -34)-15%2,result.getValue());
+		System.out.println(result);
+	}
 	
 }
