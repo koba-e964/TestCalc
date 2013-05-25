@@ -44,6 +44,41 @@ public class Parser {
 			return num.toString();
 		}
 	}
+	public VariableExpression variable()
+	{
+		return new VariableExpression(scan.next());
+	}
+	public static class VariableExpression extends AbstractExpression
+	{
+		String name;
+		public VariableExpression(Token tok)
+		{
+			if(tok.getType()!=VARIABLE)
+			{
+				throw new IllegalArgumentException("Invalid variable:"+tok.getContent());
+			}
+			name=tok.getContent();
+		}
+		@Override
+		public int getValue()
+		{
+			return VariableMap.get(name);
+		}
+		public String getName()
+		{
+			return name;
+		}
+		public void assign(int value)
+		{
+			VariableMap.put(name, value);
+		}
+		@Override
+		public String toString()
+		{
+			return "var:"+name;
+		}
+	}
+
 	public UnaryOperator unop()
 	{
 		return new UnaryOperator(scan.next());
@@ -95,8 +130,10 @@ public class Parser {
 		}
 		case NUMERIC:
 			return new UnaryExpression(numeric());
+		case VARIABLE:
+			return new UnaryExpression(variable());
 		default:
-			throw new IllegalStateException("unary() couldn't find an unary expression");
+			throw new IllegalStateException("unary() couldn't find an unary expression"+scan);
 		}
 		//constructor UnaryExpression(BinaryOperator,UnaryExpression,UnaryExpression) is not dealt with here.
 	}
@@ -116,6 +153,10 @@ public class Parser {
 		 */
 		NumericExpression num;
 		/*
+		 * VariableExpression
+		 */
+		VariableExpression vex;
+		/*
 		 * For OpParser's use only
 		 * (biop)
 		 */
@@ -133,6 +174,10 @@ public class Parser {
 		public UnaryExpression(NumericExpression nex)
 		{
 			num=nex;
+		}
+		public UnaryExpression(VariableExpression vex)
+		{
+			this.vex=vex;
 		}
 		/**
 		 * This constructor should be called only in OpParser.
@@ -165,14 +210,34 @@ public class Parser {
 			{
 				return num.getValue();
 			}
+			if(vex!=null)
+			{
+				return vex.getValue();
+			}
 			return getValueBiop();
 		}
 		private int getValueBiop()
 		{
+			String name=bop.getName();
+			/*
+			 * assignment
+			 */
+			if(name.equals("="))
+			{
+				if(term1.vex!=null)
+				{
+					int val=term2.getValue();
+					term1.vex.assign(val);
+					return val;
+				}
+				else
+				{
+					throw new IllegalStateException("invalid assignment:"+term1+" <== "+term2);
+				}
+			}
 			int val1=term1.getValue();
 			int val2=term2.getValue();
 			//case(bop.getName())
-			String name=bop.getName();
 			if(name.equals("+"))
 			{
 				return val1+val2;
@@ -253,6 +318,8 @@ public class Parser {
 			if(ex!=null)return ex.toString();
 			if(num!=null)
 				return num.toString();
+			if(vex!=null)
+				return vex.toString();
 			return "("+bop.getName()+" "+term1+" "+term2+")";
 		}
 	}

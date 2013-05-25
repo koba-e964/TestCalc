@@ -60,13 +60,31 @@ public class ParserTest {
 	@Test
 	public void testExp2() {
 		String[] split=Tokenizer.split("21*(-15+34* -34)-15%2");
-		for(String s:split){
-			System.out.print(s+" ");
-		}
 		Parser parser=new Parser(new Scanner(split));
 		Expression result=parser.exp();
 		assertEquals(21*(-15+34* -34)-15%2,result.getValue());
 		System.out.println(result);
+	}
+	@Test
+	public void testExp3() {
+		String[] split=Tokenizer.split("3000000*(13*13-11*11)/(13*13+11*11)");
+		Parser parser=new Parser(new Scanner(split));
+		Expression result=parser.exp();
+		System.out.println(result.getValue());
+	}
+	@Test
+	public void testExp4() {
+		String[] code={"val=2","val*23"};
+		for(String c:code)
+		{
+			String[] split=Tokenizer.split(c);
+			Parser parser=new Parser(new Scanner(split));
+			Expression result=parser.exp();
+			System.out.println("code=\""+c+"\"");
+			System.out.println(result);
+			System.out.println(result.getValue());
+			//System.out.println(VariableMap.vars);
+		}
 	}
 	
 }

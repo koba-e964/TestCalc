@@ -6,4 +6,5 @@ public enum TokenType
 	OPERATOR,
 	LEFT_PAREN,
 	RIGHT_PAREN,
+	VARIABLE,
 }

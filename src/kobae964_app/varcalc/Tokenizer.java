@@ -43,24 +43,6 @@ public class Tokenizer
 	private Tokenizer()
 	{
 	}
-	public static void main(String[] args)
-	{
-		String[] test1=split("");
-		String[] test2=split("23+(25  *  44)");
-		String[] test3=split_il("$temp1:$tmpfunc(87,10)");
-		class Tmp
-		{
-			public void show(String[] s)
-			{
-				for(String t:s)
-					System.out.print(t+"\r\n");
-				System.out.print("\r\n");
-			}
-		};
-		new Tmp().show(test1);
-		new Tmp().show(test2);
-		new Tmp().show(test3);
-	}
 	public static int getType(String s)
 	{
 		if(s.length()==0)

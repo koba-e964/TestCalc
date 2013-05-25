@@ -29,4 +29,19 @@ public class Scanner {
 	{
 		return pos<token.length;
 	}
+	@Override
+	public String toString()
+	{
+		StringBuilder sb=new StringBuilder("Scanner(pos="+pos+", toks:\n read:\n");
+		for(int i=0;i<pos;i++)
+		{
+			sb.append(token[i]+" ");
+		}
+		sb.append("\nremaining:\n");
+		for(int i=pos;i<token.length;i++)
+		{
+			sb.append(token[i]+" ");
+		}
+		return sb.toString();
+	}
 }
