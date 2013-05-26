@@ -3,10 +3,6 @@ package kobae964_app.varcalc;
 import static org.junit.Assert.*;
 
 
-import kobae964_app.varcalc.Parser.BinaryOperator;
-import kobae964_app.varcalc.Parser.NumericExpression;
-import kobae964_app.varcalc.Parser.OperatedExpression;
-import kobae964_app.varcalc.Parser.UnaryExpression;
 
 import org.junit.Test;
 

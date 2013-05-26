@@ -3,8 +3,6 @@ package kobae964_app.varcalc;
 import java.util.ArrayList;
 import java.util.List;
 
-import kobae964_app.varcalc.Parser.BinaryOperator;
-import kobae964_app.varcalc.Parser.UnaryExpression;
 
 class OpStack
 {
@@ -13,8 +11,8 @@ class OpStack
 	OperatorComparator oc;
 	OpStack(OperatorComparator oc)
 	{
-		us=new ArrayList<Parser.UnaryExpression>();
-		os=new ArrayList<Parser.BinaryOperator>();
+		us=new ArrayList<UnaryExpression>();
+		os=new ArrayList<BinaryOperator>();
 		this.oc=oc;
 	}
 	void pushUnary(UnaryExpression uex)

@@ -1,7 +1,5 @@
 package kobae964_app.varcalc;
 
-import kobae964_app.varcalc.Parser.OperatedExpression;
-import kobae964_app.varcalc.Parser.UnaryExpression;
 
 public class OpParser {
 	public static UnaryExpression parse(OperatedExpression oex)

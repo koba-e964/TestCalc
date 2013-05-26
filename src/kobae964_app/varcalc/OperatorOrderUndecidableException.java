@@ -1,6 +1,5 @@
 package kobae964_app.varcalc;
 
-import kobae964_app.varcalc.Parser.BinaryOperator;
 
 public class OperatorOrderUndecidableException extends RuntimeException
 {

@@ -1,8 +1,6 @@
 package kobae964_app.varcalc;
 
 import static org.junit.Assert.*;
-import kobae964_app.varcalc.Parser.Expression;
-import kobae964_app.varcalc.Parser.OperatedExpression;
 
 import org.junit.Test;
 
